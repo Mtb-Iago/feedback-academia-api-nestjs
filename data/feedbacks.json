@@ -1,0 +1,19 @@
+[
+  {
+    "id_feedback": "43a35767-5e6c-45d4-9649-fed482ef4db8",
+    "clienteId": "cliente-123",
+    "filialId": "filial-456",
+    "status_feedback": "ABERTO",
+    "data_criacao": "2026-05-09T12:04:06.965Z",
+    "respostas": [
+      {
+        "perguntaId": "pergunta-1",
+        "opcao_escolhida": 5
+      },
+      {
+        "perguntaId": "pergunta-2",
+        "opcao_escolhida": 4
+      }
+    ]
+  }
+]
