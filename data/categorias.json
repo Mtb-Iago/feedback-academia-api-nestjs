@@ -1,0 +1,38 @@
+[
+  {
+    "id_categoria": 1,
+    "nome": "Dados Pessoais",
+    "descricao": "Informações sensíveis e de identificação pessoal dos usuários ou colaboradores.",
+    "ordem_exibicao": 1
+  },
+  {
+    "id_categoria": 2,
+    "nome": "Inativo",
+    "descricao": "Registros e dados arquivados que não estão mais em operação ou uso ativo no sistema.",
+    "ordem_exibicao": 2
+  },
+  {
+    "id_categoria": 3,
+    "nome": "Equipe",
+    "descricao": "Dados relacionados à gestão de pessoas, cargos, setores e times corporativos.",
+    "ordem_exibicao": 3
+  },
+  {
+    "id_categoria": 4,
+    "nome": "Estrutura",
+    "descricao": "Informações sobre a hierarquia, departamentos e organização estrutural da empresa.",
+    "ordem_exibicao": 4
+  },
+  {
+    "id_categoria": 5,
+    "nome": "Geral",
+    "descricao": "Configurações e informações sistêmicas que não se enquadram em categorias específicas.",
+    "ordem_exibicao": 5
+  },
+  {
+    "id_categoria": 6,
+    "nome": "teste",
+    "descricao": "teste",
+    "ordem_exibicao": 6
+  }
+]

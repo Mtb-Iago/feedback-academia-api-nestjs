@@ -9,8 +9,10 @@ import { JsonFeedbackRepository } from './infrastructure/adapters/database/json/
 import { FeedbackController } from './infrastructure/http/controllers/feedback.controller';
 import { ClienteRepository } from './core/ports/cliente.repository';
 import { JsonClienteRepository } from './infrastructure/adapters/database/json/json-cliente.repository';
+import { FilialModule } from './filial.module';
 
 @Module({
+  imports: [FilialModule],
   controllers: [FeedbackController],
   providers: [
     CriarFeedbackUseCase,

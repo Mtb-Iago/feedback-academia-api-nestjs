@@ -15,7 +15,7 @@ A estrutura segue o padrão hexagonal para garantir testabilidade e facilidade d
 ## 📂 Domínios Implementados
 
 1.  **Categoria:** Classificação das perguntas (ex: Limpeza, Atendimento, Preço).
-2.  **Filial:** Unidades físicas avaliadas.
+2.  **Filial:** Unidades físicas avaliadas. **CRUD completo implementado.**
 3.  **Cliente:** Usuários que fornecem o feedback.
 4.  **Feedback:** Composto por perguntas e respostas objetivas (escala de satisfação).
 
@@ -26,6 +26,7 @@ A estrutura segue o padrão hexagonal para garantir testabilidade e facilidade d
 * **Documentação:** Swagger (@nestjs/swagger)
 * **Validação:** Class-validator & Class-transformer
 * **Persistência:** File System (JSON) - *Preparado para migração SQL*
+* **Testes:** Jest + @nestjs/testing
 
 ## 🚀 Como Executar
 
@@ -42,9 +43,11 @@ A estrutura segue o padrão hexagonal para garantir testabilidade e facilidade d
 3.  **Acessar documentação (Swagger):**
     Abra o navegador em `http://localhost:3000/api`
 
-## 📡 Endpoints (Feedback)
+## 📡 Endpoints
 
-* `POST /feedbacks`: Cria um novo feedback com múltiplas respostas.
+### Feedback
+
+* `POST /feedbacks`: Cria um novo feedback com múltiplas respostas. **Valida se o `filialId` informado existe** antes de gravar (lança `404 Not Found` caso contrário).
 * `GET /feedbacks`: Lista todos os feedbacks gravados no arquivo JSON.
 * `PATCH /feedbacks/:id`: Atualiza dados ou respostas de um feedback existente.
 * `DELETE /feedbacks/:id`: Remove um registro de feedback.
@@ -55,6 +58,57 @@ A estrutura segue o padrão hexagonal para garantir testabilidade e facilidade d
 * `GET /clientes/:id`: Busca um cliente específico pelo ID.
 * `PATCH /clientes/:id`: Atualiza os dados de um cliente existente.
 * `DELETE /clientes/:id`: Remove um cliente do sistema.
+
+### Filial
+
+* `POST /filiais`: Cria uma nova filial. O `id_filial` (Int) é gerado automaticamente pelo repositório (autoincrement com base no maior id existente).
+* `GET /filiais`: Lista todas as filiais cadastradas.
+* `PATCH /filiais/:id`: Atualização parcial dos campos de uma filial. O `id_filial` é protegido contra sobrescrita.
+* `DELETE /filiais/:id`: Remove uma filial pelo id.
+
+**Modelo de Filial** (espelha a tabela `FILIAIS` do diagrama ER):
+
+| Campo | Tipo | Descrição |
+|---|---|---|
+| `id_filial` | `number` | PK, gerado pelo repositório |
+| `nome` | `string` | Nome da filial |
+| `endereco` | `string` | Endereço completo |
+| `telefone` | `string` | Telefone de contato |
+| `email` | `string` | E-mail de contato (validado por `@IsEmail`) |
+
+## 🔗 Integração entre Módulos
+
+O módulo de **Feedback** depende do módulo de **Filial** para validar a existência da filial referenciada ao criar um feedback. Essa integração é feita via **injeção de dependência** seguindo o padrão hexagonal:
+
+* `FilialModule` exporta o token `FilialRepository`.
+* `FeedbackModule` importa `FilialModule`, ganhando acesso ao provider exportado.
+* `CriarFeedbackUseCase` recebe o `FilialRepository` no construtor e consulta `buscarPorId` antes de persistir o feedback. Se a filial não existir, lança `NotFoundException`.
+
+Como o `filialId` no Feedback é `string` e o `id_filial` na Filial é `number` (conforme o diagrama), a conversão é feita pontualmente no use-case via `Number(dados.filialId)`.
+
+## 🧪 Testes
+
+Suíte unitária completa para todos os use-cases de **Filial**, escrita com **Jest** + `@nestjs/testing` (mock injetado via `useValue` no token da porta abstrata).
+
+| Use-case | Arquivo de teste | Cenários cobertos |
+|---|---|---|
+| `CriarFilialUseCase` | `create-filial.use-case.spec.ts` | sucesso, propagação de erros, instância de `Filial`, placeholder de id, múltiplas execuções |
+| `ListarFiliaisUseCase` | `listar-filiais.use-case.spec.ts` | retorno da lista, lista vazia, propagação de erros |
+| `AtualizarFilialUseCase` | `atualizar-filial.use-case.spec.ts` | sucesso, ordem `buscarPorId → atualizar`, atualização parcial, `NotFoundException`, propagação de erros |
+| `DeletarFilialUseCase` | `deletar-filial.use-case.spec.ts` | sucesso, ordem das chamadas, `NotFoundException`, não-execução do delete em caso de erro, propagação de erros |
+
+**Comandos:**
+
+```bash
+# Roda toda a suíte
+npm test
+
+# Apenas os testes de filial
+npm test -- filial
+
+# Cobertura
+npm run test:cov
+```
 
 ## 📊 Métricas e Queries Planejadas (SQL)
 
@@ -70,12 +124,60 @@ O sistema foi desenhado para suportar as seguintes métricas analíticas assim q
 
 ```text
 src/
-├── core/                         # Núcleo da aplicação
-│   ├── domain/                   # Entidades (Categoria, Filial, Cliente, Feedback)
-│   ├── ports/                    # Classes Abstratas (Contratos de Repositório)
-│   └── use-cases/                # Lógica de negócio (SRP - Single Responsibility)
-├── infrastructure/               # Detalhes técnicos
-│   ├── adapters/                 # Implementações de DB (JSON)
-│   ├── http/                     # Controladores e DTOs (Swagger/Validation)
-│   └── framework/                # Módulos NestJS e configurações
-└── main.ts                       # Bootstrap da aplicação
+├── core/                                       # Núcleo da aplicação
+│   ├── domain/                                 # Entidades de negócio
+│   │   ├── categoria.entity.ts
+│   │   ├── cliente.entity.ts
+│   │   ├── filial.entity.ts                    # ← entidade Filial (diagrama ER)
+│   │   └── feedback/
+│   │       ├── feedback.entity.ts
+│   │       ├── pergunta.entity.ts
+│   │       └── resposta-objetiva.entity.ts
+│   ├── ports/                                  # Contratos (classes abstratas)
+│   │   ├── categoria.repository.ts
+│   │   ├── feedback.repository.ts
+│   │   └── filial.repository.ts                # ← porta da Filial
+│   └── use-cases/                              # Lógica de negócio
+│       ├── feedback/
+│       │   ├── create-feedback.use-case.ts     # ← injeta FilialRepository
+│       │   ├── listar-feedbacks.use-case.ts
+│       │   ├── atualizar-feedback.use-case.ts
+│       │   └── deletar-feedback.use-case.ts
+│       └── filial/
+│           ├── create-filial.use-case.ts
+│           ├── create-filial.use-case.spec.ts
+│           ├── listar-filiais.use-case.ts
+│           ├── listar-filiais.use-case.spec.ts
+│           ├── atualizar-filial.use-case.ts
+│           ├── atualizar-filial.use-case.spec.ts
+│           ├── deletar-filial.use-case.ts
+│           └── deletar-filial.use-case.spec.ts
+├── infrastructure/                             # Detalhes técnicos
+│   ├── adapters/database/json/                 # Persistência JSON
+│   │   ├── json-feedback.repository.ts
+│   │   └── json-filial.repository.ts           # ← adapter JSON da Filial
+│   └── http/
+│       ├── controllers/
+│       │   ├── feedback.controller.ts
+│       │   └── filial.controller.ts            # ← rotas REST de Filial
+│       └── dtos/
+│           ├── criar-feedback.dto.ts
+│           ├── atualizar-feedback.dto.ts
+│           ├── criar-filial.dto.ts             # ← validações (IsString/IsEmail)
+│           └── atualizar-filial.dto.ts
+├── feedback.module.ts                          # ← importa FilialModule
+├── filial.module.ts                            # ← exporta FilialRepository
+├── app.module.ts                               # ← registra FilialModule
+└── main.ts                                     # Bootstrap da aplicação
+
+data/
+├── feedbacks.json
+└── filiais.json                                # ← persistência de Filial
+```
+
+## 🗒️ Changelog Recente
+
+* **CRUD de Filial** implementado seguindo a arquitetura hexagonal (entidade, porta, 4 use-cases, adapter JSON, DTOs com validação, controller, módulo Nest).
+* **Validação de existência de filial** ao criar feedback, via injeção de dependência (`FilialRepository` no `CriarFeedbackUseCase`).
+* **Suíte de testes unitários** completa para os 4 use-cases de filial (~44 testes no total).
+* **Persistência JSON** da filial em `data/filiais.json` com `id_filial` autoincremental.
