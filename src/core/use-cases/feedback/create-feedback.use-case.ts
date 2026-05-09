@@ -1,8 +1,20 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { FeedbackRepository } from '../../ports/feedback.repository';
 import { FilialRepository } from '../../ports/filial.repository';
-import { Feedback, IFeedback } from '../../domain/feedback/feedback.entity';
+import { Feedback } from '../../domain/feedback/feedback.entity';
+import { RespostaObjetiva } from '../../domain/feedback/resposta-objetiva.entity';
 import { ClienteRepository } from 'src/core/ports/cliente.repository';
+
+/**
+ * Campos que o chamador (controller) deve fornecer ao criar um feedback.
+ * Os campos `id_feedback`, `status_feedback` e `data_criacao` são gerados
+ * internamente pelo próprio use-case e por isso não fazem parte do input.
+ */
+export interface CriarFeedbackInput {
+  clienteId: string;
+  filialId: string;
+  respostas: RespostaObjetiva[];
+}
 
 @Injectable()
 export class CriarFeedbackUseCase {
@@ -12,7 +24,7 @@ export class CriarFeedbackUseCase {
     private readonly filialRepo: FilialRepository,
   ) {}
 
-  async executar(dados: IFeedback): Promise<Feedback> {
+  async executar(dados: CriarFeedbackInput): Promise<Feedback> {
     const cliente = await this.clienteRepo.buscarPorId(dados.clienteId);
 
     if (!cliente) {

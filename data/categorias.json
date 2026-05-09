@@ -7,9 +7,9 @@
   },
   {
     "id_categoria": 2,
-    "nome": "Inativo",
-    "descricao": "Registros e dados arquivados que não estão mais em operação ou uso ativo no sistema.",
-    "ordem_exibicao": 2
+    "nome": "teste patch",
+    "descricao": "Informações sensíveis e de identificação.",
+    "ordem_exibicao": 1
   },
   {
     "id_categoria": 3,
