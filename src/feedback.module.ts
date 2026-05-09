@@ -6,8 +6,10 @@ import { DeletarFeedbackUseCase } from './core/use-cases/feedback/deletar-feedba
 import { ListarFeedbacksUseCase } from './core/use-cases/feedback/listar-feedbacks.use-case';
 import { JsonFeedbackRepository } from './infrastructure/adapters/database/json/json-feedback.repository';
 import { FeedbackController } from './infrastructure/http/controllers/feedback.controller';
+import { FilialModule } from './filial.module';
 
 @Module({
+  imports: [FilialModule],
   controllers: [FeedbackController],
   providers: [
     CriarFeedbackUseCase,
