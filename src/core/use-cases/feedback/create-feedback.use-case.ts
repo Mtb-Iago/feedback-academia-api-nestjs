@@ -1,13 +1,34 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { FeedbackRepository } from '../../ports/feedback.repository';
+import { FilialRepository } from '../../ports/filial.repository';
 import { Feedback } from '../../domain/feedback/feedback.entity';
 
 @Injectable()
 export class CriarFeedbackUseCase {
-  constructor(private readonly feedbackRepo: FeedbackRepository) {}
+  constructor(
+    private readonly feedbackRepo: FeedbackRepository,
+    private readonly filialRepo: FilialRepository,
+  ) {}
 
   async executar(dados: any): Promise<Feedback> {
-    // Aqui viria a lógica de validação de negócio e criação da entidade
+    // Validação de negócio: a filial referenciada precisa existir.
+    // O filialId trafega como string, mas a PK da filial é Int (id_filial).
+    const idFilialNumerico = Number(dados.filialId);
+
+    if (!Number.isInteger(idFilialNumerico)) {
+      throw new NotFoundException(
+        `Filial com ID ${dados.filialId} não encontrada`,
+      );
+    }
+
+    const filialExiste = await this.filialRepo.buscarPorId(idFilialNumerico);
+
+    if (!filialExiste) {
+      throw new NotFoundException(
+        `Filial com ID ${dados.filialId} não encontrada`,
+      );
+    }
+
     const novoFeedback = new Feedback(
       crypto.randomUUID(),
       dados.clienteId,

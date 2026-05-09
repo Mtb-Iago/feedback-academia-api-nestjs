@@ -1,0 +1,9 @@
+[
+  {
+    "id_filial": 1,
+    "nome": "Academia Centro",
+    "endereco": "Rua das Flores, 123 - Centro",
+    "telefone": "(11) 99999-9999",
+    "email": "contato@academia.com"
+  }
+]

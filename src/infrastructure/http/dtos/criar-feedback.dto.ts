@@ -41,8 +41,10 @@ export class CriarFeedbackDto {
   clienteId: string;
 
   @ApiProperty({
-    example: 'uuid-filial-01',
-    description: 'ID da filial avaliada',
+    example: '1',
+    description:
+      'ID da filial avaliada (deve corresponder a um id_filial existente em /filiais). ' +
+      'O valor é tratado como string mas representa o Int da PK da filial.',
   })
   @IsString()
   @IsNotEmpty()

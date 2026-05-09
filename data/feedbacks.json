@@ -15,5 +15,19 @@
         "opcao_escolhida": 4
       }
     ]
+  },
+  {
+    "id_feedback": "cdab0189-1517-458f-99a3-6a1ece1a2748",
+    "clienteId": "uuid-cliente-001",
+    "filialId": "1",
+    "status_feedback": "ABERTO",
+    "data_criacao": "2026-05-09T13:05:11.543Z",
+    "respostas": [
+      {
+        "id_resposta": "2ea4e13a-b2b1-467d-9cd3-1acd7e11f003",
+        "perguntaId": "uuid-pergunta-123",
+        "opcao_escolhida": 5
+      }
+    ]
   }
 ]

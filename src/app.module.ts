@@ -3,12 +3,10 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { FeedbackModule } from './feedback.module';
 import { CategoriaModule } from './categoria.module'; 
+import { FilialModule } from './filial.module';
 
 @Module({
-  imports: [
-    FeedbackModule, 
-    CategoriaModule 
-  ],
+  imports: [FeedbackModule, FilialModule, CategoriaModule],
   controllers: [AppController],
   providers: [AppService],
 })

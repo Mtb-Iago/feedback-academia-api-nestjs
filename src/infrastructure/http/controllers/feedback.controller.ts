@@ -37,9 +37,19 @@ export class FeedbackController {
   ) {}
 
   @Post()
-  @ApiOperation({ summary: 'Registrar um novo feedback' })
+  @ApiOperation({
+    summary: 'Registrar um novo feedback',
+    description:
+      'Cria um novo feedback. Antes de gravar, o serviço valida se o `filialId` ' +
+      'informado corresponde a uma filial existente em `/filiais`. ' +
+      'Caso contrário, retorna 404.',
+  })
   @ApiResponse({ status: 201, description: 'Feedback criado com sucesso.' })
   @ApiResponse({ status: 400, description: 'Dados de entrada inválidos.' })
+  @ApiResponse({
+    status: 404,
+    description: 'Filial referenciada (filialId) não encontrada.',
+  })
   @HttpCode(HttpStatus.CREATED)
   async criar(@Body() dto: CriarFeedbackDto) {
     // Convertendo as respostas do DTO para a Entidade de Domínio gerando o ID necessário
