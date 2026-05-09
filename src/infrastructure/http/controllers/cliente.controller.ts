@@ -12,10 +12,10 @@ import {
 import { ApiTags, ApiOperation, ApiResponse, ApiParam } from '@nestjs/swagger';
 
 // Use Cases
-import { CriarClienteUseCase } from 'src/core/use-cases/feedback/create-cliente.use-case';
-import { DeletarClienteUseCase } from 'src/core/use-cases/feedback/deletar-cliente.use-case';
-import { ListarClientesUseCase } from 'src/core/use-cases/feedback/listar-cliente.use-case';
-import { AtualizarClienteUseCase } from 'src/core/use-cases/feedback/atualizar-cliente.use-case';
+import { CriarClienteUseCase } from 'src/core/use-cases/cliente/create-cliente.use-case';
+import { DeletarClienteUseCase } from 'src/core/use-cases/cliente/deletar-cliente.use-case';
+import { ListarClientesUseCase } from 'src/core/use-cases/cliente/listar-cliente.use-case';
+import { AtualizarClienteUseCase } from 'src/core/use-cases/cliente/atualizar-cliente.use-case';
 
 // DTOs
 import { CriarClienteDto } from '../dtos/criar-cliente.dto';

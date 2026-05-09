@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { FeedbackRepository } from '../../ports/feedback.repository';
 import { FilialRepository } from '../../ports/filial.repository';
-import { Feedback } from '../../domain/feedback/feedback.entity';
+import { Feedback, IFeedback } from '../../domain/feedback/feedback.entity';
 import { ClienteRepository } from 'src/core/ports/cliente.repository';
 
 @Injectable()
@@ -12,7 +12,7 @@ export class CriarFeedbackUseCase {
     private readonly filialRepo: FilialRepository,
   ) {}
 
-  async executar(dados: any): Promise<Feedback> {
+  async executar(dados: IFeedback): Promise<Feedback> {
     const cliente = await this.clienteRepo.buscarPorId(dados.clienteId);
 
     if (!cliente) {
