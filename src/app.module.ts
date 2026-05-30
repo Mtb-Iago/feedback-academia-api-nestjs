@@ -8,6 +8,7 @@ import { FilialModule } from './filial.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { FeedbackOrmEntity } from './infrastructure/adapters/database/typeorm/entities/feedback.orm-entity';
 import { RespostaObjetivaOrmEntity } from './infrastructure/adapters/database/typeorm/entities/resposta-objetiva.orm-entity';
+import { ClienteOrmEntity } from './infrastructure/adapters/database/typeorm/entities/cliente.orm-entity';
 
 @Module({
   imports: [
@@ -18,7 +19,7 @@ import { RespostaObjetivaOrmEntity } from './infrastructure/adapters/database/ty
       username: 'admin',
       password: 'admin_password',
       database: 'feedback_db',
-      entities: [FeedbackOrmEntity, RespostaObjetivaOrmEntity],
+      entities: [FeedbackOrmEntity, RespostaObjetivaOrmEntity, ClienteOrmEntity],
       synchronize: true, // APENAS PARA DESENVOLVIMENTO (Cria as tabelas automaticamente)
     }),
     FeedbackModule,

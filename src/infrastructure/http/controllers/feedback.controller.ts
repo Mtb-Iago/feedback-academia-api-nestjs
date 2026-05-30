@@ -69,7 +69,7 @@ export class FeedbackController {
           ),
       ),
     };
-
+    console.log(dadosMapeados);
     return await this.criarUC.executar(dadosMapeados);
   }
 

@@ -6,4 +6,9 @@ export abstract class ClienteRepository {
   abstract listarTodos(): Promise<Cliente[]>;
   abstract atualizar(id: string, dados: Partial<Cliente>): Promise<Cliente>;
   abstract deletar(id: string): Promise<void>;
+  abstract buscarPorFiltros(filtros: {
+    nome?: string;
+    email?: string;
+    telefone?: string;
+  }): Promise<Cliente[]>;
 }
