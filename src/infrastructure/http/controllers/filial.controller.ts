@@ -6,17 +6,19 @@ import {
   Delete,
   Body,
   Param,
+  Query, // <-- Adicionado para capturar os filtros da URL
   ParseIntPipe,
   HttpCode,
   HttpStatus,
 } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiParam } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiResponse, ApiParam } from '@nestjs/swagger'; // <-- Adicionado ApiQuery
 
 // Casos de Uso
 import { CriarFilialUseCase } from '../../../core/use-cases/filial/create-filial.use-case';
 import { ListarFiliaisUseCase } from '../../../core/use-cases/filial/listar-filiais.use-case';
 import { AtualizarFilialUseCase } from '../../../core/use-cases/filial/atualizar-filial.use-case';
 import { DeletarFilialUseCase } from '../../../core/use-cases/filial/deletar-filial.use-case';
+import { BuscarFilialUseCase } from '../../../core/use-cases/filial/buscar-filial.use-case'; // <-- Novo Use Case
 
 // DTOs
 import { CriarFilialDto } from '../dtos/criar-filial.dto';
@@ -24,6 +26,7 @@ import { AtualizarFilialDto } from '../dtos/atualizar-filial.dto';
 
 // Entidade de Domínio
 import { Filial } from '../../../core/domain/filial.entity';
+import { BuscarFilialFiltroDto } from '../dtos/buscar-filial-filtro.dto';
 
 @ApiTags('filiais')
 @Controller('filiais')
@@ -33,6 +36,7 @@ export class FilialController {
     private readonly listarUC: ListarFiliaisUseCase,
     private readonly atualizarUC: AtualizarFilialUseCase,
     private readonly deletarUC: DeletarFilialUseCase,
+    private readonly buscarUC: BuscarFilialUseCase,
   ) {}
 
   @Post()
@@ -57,6 +61,16 @@ export class FilialController {
   })
   async listar() {
     return await this.listarUC.executar();
+  }
+
+  @Get('busca')
+  @ApiOperation({ summary: 'Filtrar filiais por critérios especificados' })
+  @ApiResponse({
+    status: 200,
+    description: 'Resultado da busca retornado com sucesso.',
+  })
+  async buscarPorFiltros(@Query() query: BuscarFilialFiltroDto) {
+    return await this.buscarUC.executar(query);
   }
 
   @Patch(':id')

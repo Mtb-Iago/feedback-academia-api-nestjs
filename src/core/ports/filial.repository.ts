@@ -6,4 +6,5 @@ export abstract class FilialRepository {
   abstract listarTodos(): Promise<Filial[]>;
   abstract atualizar(id: number, dados: Partial<Filial>): Promise<Filial>;
   abstract deletar(id: number): Promise<void>;
+  abstract buscarPorFiltros(nome?: string): Promise<Filial | null>;
 }
