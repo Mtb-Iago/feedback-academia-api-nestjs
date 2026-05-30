@@ -61,4 +61,25 @@ export class JsonCategoriaRepository implements CategoriaRepository {
     const filtrados = categorias.filter((c) => c.id_categoria !== id);
     await this.escreverArquivo(filtrados);
   }
+
+// ... (restante do código anterior permanece igual)
+
+  async buscarPorFiltros(nome?: string): Promise<Categoria> {
+    const categorias = await this.lerArquivo();
+
+    if (!nome) {
+      throw new Error('O parâmetro "nome" é obrigatório para realizar a busca.');
+    }
+
+    // Busca pela categoria (ignorando maiúsculas/minúsculas)
+    const categoria = categorias.find(
+      (c) => c.nome.toLowerCase() === nome.toLowerCase()
+    );
+
+    if (!categoria) {
+      throw new Error(`Categoria com o nome "${nome}" não encontrada.`);
+    }
+
+    return categoria;
+  }
 }

@@ -10,6 +10,8 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { FeedbackOrmEntity } from './infrastructure/adapters/database/typeorm/entities/feedback.orm-entity';
 import { RespostaObjetivaOrmEntity } from './infrastructure/adapters/database/typeorm/entities/resposta-objetiva.orm-entity';
 import { ClienteOrmEntity } from './infrastructure/adapters/database/typeorm/entities/cliente.orm-entity';
+import { CategoriaOrmEntity } from './infrastructure/adapters/database/typeorm/entities/categoria.orm-entity';
+import { FilialOrmEntity } from './infrastructure/adapters/database/typeorm/entities/filial.orm-entity';
 
 @Module({
   imports: [
@@ -28,6 +30,8 @@ import { ClienteOrmEntity } from './infrastructure/adapters/database/typeorm/ent
           FeedbackOrmEntity,
           RespostaObjetivaOrmEntity,
           ClienteOrmEntity,
+          CategoriaOrmEntity,
+          FilialOrmEntity,
         ],
         synchronize: true, // APENAS PARA DESENVOLVIMENTO (Cria as tabelas automaticamente)
       }),
