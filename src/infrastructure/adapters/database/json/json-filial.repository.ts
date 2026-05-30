@@ -80,4 +80,18 @@ export class JsonFilialRepository implements FilialRepository {
     const filtrados = filiais.filter((f) => f.id_filial !== id);
     await this.escreverArquivo(filtrados);
   }
+
+  async buscarPorFiltros(nome?: string): Promise<Filial | null> {
+    const filiais = await this.lerArquivo();
+
+    // Se nenhum filtro for passado, você pode decidir retornar null ou lançar um erro
+    if (!nome) return null;
+
+    // Busca insensível a maiúsculas/minúsculas que verifica se o nome contém o termo buscado
+    const filialEncontrada = filiais.find((f) =>
+      f.nome.toLowerCase().includes(nome.toLowerCase()),
+    );
+
+    return filialEncontrada || null;
+  }
 }
