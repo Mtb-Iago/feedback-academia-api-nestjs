@@ -26,7 +26,7 @@ export class CriarFeedbackUseCase {
 
   async executar(dados: CriarFeedbackInput): Promise<Feedback> {
     const cliente = await this.clienteRepo.buscarPorId(dados.clienteId);
-
+    
     if (!cliente) {
       throw new NotFoundException('Cliente não encontrado');
     }

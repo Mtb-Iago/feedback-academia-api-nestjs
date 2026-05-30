@@ -10,14 +10,14 @@ A estrutura segue o padrão hexagonal para garantir testabilidade e facilidade d
 * **Ports (Portas):** Interfaces (Classes Abstratas no TypeScript) que definem como o núcleo se comunica com o mundo externo.
 * **Adapters (Adaptadores):**
     * **Entrada (Drivers):** Controladores REST (NestJS) que recebem requisições e chamam os Casos de Uso.
-    * **Saída (Driven):** Repositórios que implementam a persistência (atualmente em arquivos JSON).
+    * **Saída (Driven):** Repositórios que implementam a persistência. Os domínios de **Feedback** e **Cliente** já utilizam **PostgreSQL via TypeORM**; os demais ainda persistem em arquivos JSON.
 
 ## 📂 Domínios Implementados
 
-1.  **Categoria:** Classificação das perguntas (ex: Limpeza, Atendimento, Preço). **CRUD completo implementado.**
-2.  **Filial:** Unidades físicas avaliadas. **CRUD completo implementado.**
-3.  **Cliente:** Usuários que fornecem o feedback.
-4.  **Feedback:** Composto por perguntas e respostas objetivas (escala de satisfação).
+1.  **Categoria:** Classificação das perguntas (ex: Limpeza, Atendimento, Preço). **CRUD completo implementado** (persistência JSON).
+2.  **Filial:** Unidades físicas avaliadas. **CRUD completo implementado** (persistência JSON).
+3.  **Cliente:** Usuários que fornecem o feedback. **CRUD + busca por filtros e por ID** (persistência **PostgreSQL/TypeORM**).
+4.  **Feedback:** Composto por perguntas e respostas objetivas (escala de satisfação). Persistência **PostgreSQL/TypeORM**.
 
 ## 🛠️ Tecnologias Utilizadas
 
@@ -25,7 +25,8 @@ A estrutura segue o padrão hexagonal para garantir testabilidade e facilidade d
 * **Linguagem:** TypeScript
 * **Documentação:** Swagger (@nestjs/swagger)
 * **Validação:** Class-validator & Class-transformer
-* **Persistência:** File System (JSON) - *Preparado para migração SQL*
+* **Persistência:** PostgreSQL via TypeORM (Feedback e Cliente) + File System (JSON) para Categoria e Filial
+* **Banco de Dados:** PostgreSQL 16 (via Docker Compose)
 * **Testes:** Jest + @nestjs/testing
 
 ## 🚀 Como Executar
@@ -35,12 +36,54 @@ A estrutura segue o padrão hexagonal para garantir testabilidade e facilidade d
     npm install
     ```
 
-2.  **Iniciar em modo de desenvolvimento:**
+2.  **Subir o banco de dados (PostgreSQL via Docker):**
+    ```bash
+    docker compose up -d
+    ```
+    > O `docker-compose.yml` provisiona um PostgreSQL 16 na porta `5432` com
+    > usuário `admin`, senha `admin_password` e database `feedback_db`.
+    > Garanta que não exista outro PostgreSQL ocupando a porta `5432` no host.
+
+3.  **Configurar as variáveis de ambiente (`.env`):**
+
+    A conexão com o banco é lida de um arquivo `.env` na raiz do projeto
+    (via `@nestjs/config` + `TypeOrmModule.forRootAsync`). Copie o template:
+
+    ```bash
+    cp .env.example .env
+    ```
+
+    Os valores abaixo já apontam para o banco provisionado pelo Docker Compose
+    e podem ser usados como estão — **são credenciais apenas de desenvolvimento/teste**:
+
+    ```env
+    DB_HOST=localhost
+    DB_PORT=5432
+    DB_USERNAME=admin
+    DB_PASSWORD=admin_password
+    DB_DATABASE=feedback_db
+    ```
+
+    | Variável | Descrição | Valor padrão (Docker) |
+    | :--- | :--- | :--- |
+    | `DB_HOST` | Host do PostgreSQL | `localhost` |
+    | `DB_PORT` | Porta do PostgreSQL | `5432` |
+    | `DB_USERNAME` | Usuário do banco | `admin` |
+    | `DB_PASSWORD` | Senha do banco | `admin_password` |
+    | `DB_DATABASE` | Nome do database | `feedback_db` |
+
+    > O `.env` está no `.gitignore` e **não é versionado**. Esses mesmos valores
+    > devem coincidir com os do `docker-compose.yml`. Em produção, use credenciais
+    > próprias e nunca comite o `.env`.
+
+4.  **Iniciar em modo de desenvolvimento:**
     ```bash
     npm run start:dev
     ```
+    > Com `synchronize: true` (apenas dev), o TypeORM cria as tabelas
+    > automaticamente a partir das entidades.
 
-3.  **Acessar documentação (Swagger):**
+5.  **Acessar documentação (Swagger):**
     Abra o navegador em `http://localhost:3000/api`
 
 ## 📡 Endpoints
@@ -63,17 +106,32 @@ A estrutura segue o padrão hexagonal para garantir testabilidade e facilidade d
 
 ### Feedback
 
+Persistido em **PostgreSQL via TypeORM** (`SqlFeedbackRepository`).
+
 * `POST /feedbacks`: Cria um novo feedback com múltiplas respostas. **Valida se o `filialId` informado existe** antes de gravar (lança `404 Not Found` caso contrário).
-* `GET /feedbacks`: Lista todos os feedbacks gravados no arquivo JSON.
+* `GET /feedbacks`: Lista todos os feedbacks ou busca por filtros (`?clienteId=...&filialId=...&status=...`).
 * `PATCH /feedbacks/:id`: Atualiza dados ou respostas de um feedback existente.
 * `DELETE /feedbacks/:id`: Remove um registro de feedback.
 
-## 📡 Endpoints (Cliente)
+### Cliente
+
+Persistido em **PostgreSQL via TypeORM** (`SqlClienteRepository`).
+
 * `POST /clientes`: Cria um novo cliente.
-* `GET /clientes`: Lista todos os clientes cadastrados.
-* `GET /clientes/:id`: Busca um cliente específico pelo ID.
+* `GET /clientes`: Lista todos os clientes. Aceita **filtros opcionais** via query string: `?nome=João&email=joao@email.com&telefone=(73)99999-9999`. O filtro de `nome` é parcial e case-insensitive (`ILIKE`); `email` e `telefone` são exatos. Sem filtros, retorna todos.
+* `GET /clientes/:id`: Busca um cliente específico pelo ID (lança `404 Not Found` caso não exista).
 * `PATCH /clientes/:id`: Atualiza os dados de um cliente existente.
 * `DELETE /clientes/:id`: Remove um cliente do sistema.
+
+**Modelo de Cliente:**
+
+| Campo | Tipo | Descrição |
+| :--- | :--- | :--- |
+| `id` | `string` (uuid) | PK do cliente |
+| `nome` | `string` | Nome do cliente (Máx 100 chars) |
+| `data_cadastro` | `Date` | Data de cadastro (gerada automaticamente) |
+| `telefone` | `string` | Telefone de contato |
+| `email` | `string` | E-mail (único, validado por `@IsEmail`) |
 
 ### Filial
 
@@ -127,7 +185,7 @@ npm run test:cov
 
 ## 📊 Métricas e Queries Planejadas (SQL)
 
-O sistema foi desenhado para suportar as seguintes métricas analíticas assim que a migração para banco relacional for concluída:
+Com a migração de **Feedback** e **Cliente** para PostgreSQL/TypeORM já em andamento, o sistema foi desenhado para suportar as seguintes métricas analíticas:
 
 1.  **Aspecto de maior insatisfação:** Média de notas por categoria no ano anterior.
 2.  **Índice médio por filial:** Satisfação dos últimos 6 meses.
@@ -162,45 +220,69 @@ src/
 │       │   ├── listar-feedbacks.use-case.ts
 │       │   ├── atualizar-feedback.use-case.ts
 │       │   └── deletar-feedback.use-case.ts
-│       └── filial/
-│           ├── create-filial.use-case.ts
-│           ├── create-filial.use-case.spec.ts
-│           ├── listar-filiais.use-case.ts
-│           ├── listar-filiais.use-case.spec.ts
-│           ├── atualizar-filial.use-case.ts
-│           ├── atualizar-filial.use-case.spec.ts
-│           ├── deletar-filial.use-case.ts
-│           └── deletar-filial.use-case.spec.ts
+│       ├── filial/
+│       │   ├── create-filial.use-case.ts
+│       │   ├── create-filial.use-case.spec.ts
+│       │   ├── listar-filiais.use-case.ts
+│       │   ├── listar-filiais.use-case.spec.ts
+│       │   ├── atualizar-filial.use-case.ts
+│       │   ├── atualizar-filial.use-case.spec.ts
+│       │   ├── deletar-filial.use-case.ts
+│       │   └── deletar-filial.use-case.spec.ts
+│       └── cliente/                            # ← use-cases do Cliente
+│           ├── create-cliente.use-case.ts
+│           ├── listar-cliente.use-case.ts
+│           ├── buscar-clientes.use-case.ts     # ← busca por filtros
+│           ├── buscar-cliente-por-id.use-case.ts
+│           ├── atualizar-cliente.use-case.ts
+│           └── deletar-cliente.use-case.ts
 ├── infrastructure/                             # Detalhes técnicos
-│   ├── adapters/database/json/                 # Persistência JSON
-│   │   ├── json-categoria.repository.ts        # ← adapter JSON da Categoria
-│   │   ├── json-feedback.repository.ts
-│   │   └── json-filial.repository.ts           # ← adapter JSON da Filial
+│   ├── adapters/database/
+│   │   ├── json/                               # Persistência JSON
+│   │   │   ├── json-categoria.repository.ts    # ← adapter JSON da Categoria
+│   │   │   ├── json-cliente.repository.ts
+│   │   │   ├── json-feedback.repository.ts
+│   │   │   └── json-filial.repository.ts       # ← adapter JSON da Filial
+│   │   └── typeorm/                            # Persistência PostgreSQL
+│   │       ├── sql-feedback.repository.ts      # ← adapter SQL do Feedback
+│   │       ├── sql-cliente.repository.ts       # ← adapter SQL do Cliente
+│   │       └── entities/                       # ← entidades ORM (@Entity)
+│   │           ├── feedback.orm-entity.ts
+│   │           ├── resposta-objetiva.orm-entity.ts
+│   │           └── cliente.orm-entity.ts
 │   └── http/
 │       ├── controllers/
 │       │   ├── categoria.controller.ts         # ← rotas REST de Categoria
+│       │   ├── cliente.controller.ts           # ← rotas REST de Cliente
 │       │   ├── feedback.controller.ts
 │       │   └── filial.controller.ts            # ← rotas REST de Filial
 │       └── dtos/
 │           ├── criar-categoria.dto.ts          # ← validações de Categoria
 │           ├── atualizar-categoria.dto.ts
+│           ├── criar-cliente.dto.ts
+│           ├── atualizar-cliente.dto.ts
+│           ├── buscar-clientes.dto.ts          # ← filtros de busca de Cliente
 │           ├── criar-feedback.dto.ts
 │           ├── atualizar-feedback.dto.ts
+│           ├── buscar-feedbacks.dto.ts
 │           ├── criar-filial.dto.ts             # ← validações (IsString/IsEmail)
 │           └── atualizar-filial.dto.ts
 ├── categoria.module.ts                         # ← registra dependências da Categoria
-├── feedback.module.ts                          # ← importa FilialModule
+├── cliente.module.ts                           # ← registra TypeOrmModule + SqlClienteRepository
+├── feedback.module.ts                          # ← importa FilialModule + TypeOrmModule
 ├── filial.module.ts                            # ← exporta FilialRepository
-├── app.module.ts                               # ← registra FilialModule e CategoriaModule
+├── app.module.ts                               # ← TypeOrmModule.forRoot (PostgreSQL) + módulos
 └── main.ts                                     # Bootstrap da aplicação
 
-data/
+data/                                           # Persistência JSON (Categoria e Filial)
 ├── categorias.json                             # ← persistência de Categoria
-├── feedbacks.json
 └── filiais.json                                # ← persistência de Filial
 
 ## 🗒️ Changelog Recente
 
+* **Migração para PostgreSQL/TypeORM** dos domínios de **Feedback** e **Cliente**, com `docker-compose.yml` provisionando o banco (PostgreSQL 16) e `TypeOrmModule.forRoot` no `app.module.ts` (`synchronize: true` em dev).
+* **Persistência SQL de Cliente** (`SqlClienteRepository` + `ClienteOrmEntity`) substituindo o adapter JSON no `ClienteModule`.
+* **Busca de Cliente** por filtros (`GET /clientes?nome=&email=&telefone=`, com `ILIKE` parcial no nome) e por ID (`GET /clientes/:id` com `404` quando não encontrado), via `BuscarClientesUseCase` e `BuscarClientePorIdUseCase`.
 * **CRUD de Categoria** implementado seguindo a arquitetura hexagonal (entidade, porta, 4 use-cases, adapter JSON, DTOs com validação, controller, módulo Nest).
 * **CRUD de Filial** implementado (entidade, porta, 4 use-cases, adapter JSON, DTOs com validação, controller, módulo Nest).
 * **Validação de existência de filial** ao criar feedback, via injeção de dependência (`FilialRepository` no `CriarFeedbackUseCase`).

@@ -7,8 +7,7 @@ import { DeletarFeedbackUseCase } from './core/use-cases/feedback/deletar-feedba
 import { ListarFeedbacksUseCase } from './core/use-cases/feedback/listar-feedbacks.use-case';
 //import { JsonFeedbackRepository } from './infrastructure/adapters/database/json/json-feedback.repository';
 import { FeedbackController } from './infrastructure/http/controllers/feedback.controller';
-import { ClienteRepository } from './core/ports/cliente.repository';
-import { JsonClienteRepository } from './infrastructure/adapters/database/json/json-cliente.repository';
+import { ClienteModule } from './cliente.module';
 import { FilialModule } from './filial.module';
 import { SqlFeedbackRepository } from './infrastructure/adapters/database/typeorm/sql-feedback.repository';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -20,6 +19,7 @@ import { BuscarFeedbackUseCase } from './core/use-cases/feedback/buscar-feedback
   imports: [
     TypeOrmModule.forFeature([FeedbackOrmEntity, RespostaObjetivaOrmEntity]),
     FilialModule,
+    ClienteModule,
   ],
   controllers: [FeedbackController],
   providers: [
@@ -31,10 +31,6 @@ import { BuscarFeedbackUseCase } from './core/use-cases/feedback/buscar-feedback
     {
       provide: FeedbackRepository,
       useClass: SqlFeedbackRepository,
-    },
-    {
-      provide: ClienteRepository,
-      useClass: JsonClienteRepository,
     },
   ],
 })

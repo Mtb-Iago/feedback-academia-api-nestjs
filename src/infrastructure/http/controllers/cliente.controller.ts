@@ -8,6 +8,7 @@ import {
   HttpCode,
   HttpStatus,
   Patch,
+  Query,
 } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiParam } from '@nestjs/swagger';
 
@@ -16,10 +17,13 @@ import { CriarClienteUseCase } from 'src/core/use-cases/cliente/create-cliente.u
 import { DeletarClienteUseCase } from 'src/core/use-cases/cliente/deletar-cliente.use-case';
 import { ListarClientesUseCase } from 'src/core/use-cases/cliente/listar-cliente.use-case';
 import { AtualizarClienteUseCase } from 'src/core/use-cases/cliente/atualizar-cliente.use-case';
+import { BuscarClientesUseCase } from 'src/core/use-cases/cliente/buscar-clientes.use-case';
+import { BuscarClientePorIdUseCase } from 'src/core/use-cases/cliente/buscar-cliente-por-id.use-case';
 
 // DTOs
 import { CriarClienteDto } from '../dtos/criar-cliente.dto';
 import { AtualizarClienteDto } from '../dtos/atualizar-cliente.dto';
+import { BuscarClientesQueryDto } from '../dtos/buscar-clientes.dto';
 
 @ApiTags('clientes')
 @Controller('clientes')
@@ -29,6 +33,8 @@ export class ClienteController {
     private readonly listarUC: ListarClientesUseCase,
     private readonly deletarUC: DeletarClienteUseCase,
     private readonly atualizarUC: AtualizarClienteUseCase,
+    private readonly buscarUC: BuscarClientesUseCase,
+    private readonly buscarPorIdUC: BuscarClientePorIdUseCase,
   ) {}
 
   @Post()
@@ -41,13 +47,26 @@ export class ClienteController {
   }
 
   @Get()
-  @ApiOperation({ summary: 'Listar todos os clientes' })
+  @ApiOperation({ summary: 'Listar ou buscar clientes com filtros opcionais' })
   @ApiResponse({
     status: 200,
     description: 'Lista de clientes retornada com sucesso.',
   })
-  async listar() {
+  async listar(@Query() query: BuscarClientesQueryDto) {
+    const temFiltros = query.nome || query.email || query.telefone;
+    if (temFiltros) {
+      return await this.buscarUC.executar(query);
+    }
     return await this.listarUC.executar();
+  }
+
+  @Get(':id')
+  @ApiOperation({ summary: 'Buscar cliente por ID' })
+  @ApiParam({ name: 'id', description: 'ID do cliente', type: 'string' })
+  @ApiResponse({ status: 200, description: 'Cliente encontrado.' })
+  @ApiResponse({ status: 404, description: 'Cliente não encontrado.' })
+  async buscarPorId(@Param('id') id: string) {
+    return await this.buscarPorIdUC.executar(id);
   }
 
   @Patch(':id')

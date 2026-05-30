@@ -61,4 +61,18 @@ export class JsonClienteRepository implements ClienteRepository {
     const filtrados = clientes.filter((cliente) => cliente.id !== id);
     await this.escreverArquivo(filtrados);
   }
+
+  async buscarPorFiltros(filtros: {
+    nome?: string;
+    email?: string;
+    telefone?: string;
+  }): Promise<Cliente[]> {
+    const clientes = await this.lerArquivo();
+    return clientes.filter((c) => {
+      if (filtros.nome && !c.nome.toLowerCase().includes(filtros.nome.toLowerCase())) return false;
+      if (filtros.email && c.email !== filtros.email) return false;
+      if (filtros.telefone && c.telefone !== filtros.telefone) return false;
+      return true;
+    });
+  }
 }

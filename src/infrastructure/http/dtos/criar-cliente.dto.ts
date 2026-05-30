@@ -3,14 +3,6 @@ import { IsString, IsNotEmpty, IsDateString, IsEmail } from 'class-validator';
 
 export class CriarClienteDto {
   @ApiProperty({
-    example: 'uuid-cliente-001',
-    description: 'ID do cliente',
-  })
-  @IsString()
-  @IsNotEmpty()
-  id: string;
-
-  @ApiProperty({
     example: 'João Vitor',
     description: 'Nome do cliente',
   })
