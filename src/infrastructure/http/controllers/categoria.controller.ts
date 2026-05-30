@@ -9,6 +9,7 @@ import {
   HttpCode,
   HttpStatus,
   ParseIntPipe,
+  Query, // <-- ADICIONADO
 } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiParam } from '@nestjs/swagger';
 
@@ -17,15 +18,17 @@ import { ListarCategoriasUseCase } from '../../../core/use-cases/categoria/lista
 import { DeletarCategoriaUseCase } from '../../../core/use-cases/categoria/deletar-categoria.use-case';
 import { AtualizarCategoriaUseCase } from '../../../core/use-cases/categoria/atualizar-categoria.use-case';
 import { CriarCategoriaUseCase } from '../../../core/use-cases/categoria/criar-categoria.use-case';
+import { BuscarCategoriaUseCase } from '../../../core/use-cases/categoria/buscar-categoria.use-case'; // <-- ADICIONADO
 
 // DTOs
 import { CriarCategoriaDto } from '../dtos/criar-categoria.dto';
 import { AtualizarCategoriaDto } from '../dtos/atualizar-categoria.dto';
+import { BuscarCategoriaQueryDto } from '../dtos/buscar-categoria-query.dto'; // <-- ADICIONADO
 
 // Entidades de Domínio
 import { Categoria } from '../../../core/domain/categoria.entity';
 
-@ApiTags('categorias') // Agrupa todos os endpoints deste controller no Swagger
+@ApiTags('categorias')
 @Controller('categorias')
 export class CategoriaController {
   constructor(
@@ -33,6 +36,7 @@ export class CategoriaController {
     private readonly listarUC: ListarCategoriasUseCase,
     private readonly atualizarUC: AtualizarCategoriaUseCase,
     private readonly deletarUC: DeletarCategoriaUseCase,
+    private readonly buscarUC: BuscarCategoriaUseCase, // <-- INJETADO
   ) {}
 
   @Post()
@@ -60,12 +64,23 @@ export class CategoriaController {
     return await this.listarUC.executar();
   }
 
+  // --- NOVO MÉTODO DE BUSCA COM FILTRO ---
+  @Get('buscar')
+  @ApiOperation({ summary: 'Buscar categoria por filtros' })
+  @ApiResponse({
+    status: 200,
+    description: 'Resultado da busca retornado com sucesso.',
+  })
+  async buscar(@Query() query: BuscarCategoriaQueryDto) {
+    return await this.buscarUC.executar(query);
+  }
+
   @Patch(':id')
   @ApiOperation({ summary: 'Atualizar uma categoria existente' })
   @ApiParam({ name: 'id', description: 'ID da categoria', type: 'number' })
   @ApiResponse({
     status: 200,
-    description: 'Categoria atualizada com sucesso.',
+    description: 'Categoria updated com sucesso.',
   })
   @ApiResponse({ status: 404, description: 'Categoria não encontrada.' })
   async atualizar(

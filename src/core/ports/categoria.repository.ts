@@ -6,4 +6,5 @@ export abstract class CategoriaRepository {
   abstract listarTodos(): Promise<Categoria[]>;
   abstract atualizar(id: number, dados: Partial<Categoria>): Promise<Categoria>;
   abstract deletar(id: number): Promise<void>;
+  abstract buscarPorFiltros(nome?: string): Promise<Categoria | null>;
 }

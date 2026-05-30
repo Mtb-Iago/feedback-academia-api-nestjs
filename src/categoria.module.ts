@@ -11,9 +11,18 @@ import { DeletarCategoriaUseCase } from './core/use-cases/categoria/deletar-cate
 
 // Port (Interface) e Adapter (Implementação)
 import { CategoriaRepository } from './core/ports/categoria.repository';
-import { JsonCategoriaRepository } from './infrastructure/adapters/database/json/json-categoria.repository';
+// import { JsonCategoriaRepository } from './infrastructure/adapters/database/json/json-categoria.repository';
+// import { SqlFeedbackRepository } from './infrastructure/adapters/database/typeorm/sql-feedback.repository';
+import { CategoriaOrmEntity } from './infrastructure/adapters/database/typeorm/entities/categoria.orm-entity';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { BuscarCategoriaUseCase } from './core/use-cases/categoria/buscar-categoria.use-case';
+import { SqlCategoriaRepository } from './infrastructure/adapters/database/typeorm/sql-categoria.repository';
 
 @Module({
+  imports: [
+      TypeOrmModule.forFeature([CategoriaOrmEntity]),
+      CategoriaModule,
+  ],
   controllers: [CategoriaController],
   providers: [
     // Registrando os Casos de Uso
@@ -21,10 +30,11 @@ import { JsonCategoriaRepository } from './infrastructure/adapters/database/json
     ListarCategoriasUseCase,
     AtualizarCategoriaUseCase,
     DeletarCategoriaUseCase,
+    BuscarCategoriaUseCase,
 
     {
       provide: CategoriaRepository,
-      useClass: JsonCategoriaRepository,
+      useClass: SqlCategoriaRepository,
     },
   ],
 })
