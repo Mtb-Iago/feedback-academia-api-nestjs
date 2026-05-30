@@ -33,9 +33,7 @@ describe('CriarClienteUseCase', () => {
     }).compile();
 
     useCase = module.get<CriarClienteUseCase>(CriarClienteUseCase);
-    clienteRepo = module.get(
-      ClienteRepository,
-    ) as jest.Mocked<ClienteRepository>;
+    clienteRepo = module.get(ClienteRepository);
   });
 
   it('deve estar definido', () => {

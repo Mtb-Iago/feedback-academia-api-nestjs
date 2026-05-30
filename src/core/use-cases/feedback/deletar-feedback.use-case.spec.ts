@@ -34,9 +34,7 @@ describe('DeletarFeedbackUseCase', () => {
     }).compile();
 
     useCase = module.get<DeletarFeedbackUseCase>(DeletarFeedbackUseCase);
-    feedbackRepo = module.get(
-      FeedbackRepository,
-    ) as jest.Mocked<FeedbackRepository>;
+    feedbackRepo = module.get(FeedbackRepository);
   });
 
   it('deve estar definido', () => {

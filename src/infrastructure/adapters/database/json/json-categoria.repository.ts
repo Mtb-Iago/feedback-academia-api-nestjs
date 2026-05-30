@@ -52,7 +52,7 @@ export class JsonCategoriaRepository implements CategoriaRepository {
     if (index === -1) throw new Error('Categoria não encontrada');
     categorias[index] = { ...categorias[index], ...dados };
     await this.escreverArquivo(categorias);
-    
+
     return categorias[index];
   }
 

@@ -34,7 +34,7 @@ describe('CriarFilialUseCase', () => {
     }).compile();
 
     useCase = module.get<CriarFilialUseCase>(CriarFilialUseCase);
-    filialRepo = module.get(FilialRepository) as jest.Mocked<FilialRepository>;
+    filialRepo = module.get(FilialRepository);
   });
 
   it('deve estar definido', () => {
@@ -44,7 +44,7 @@ describe('CriarFilialUseCase', () => {
   describe('cenário de sucesso', () => {
     it('deve criar uma filial com os dados fornecidos e retornar a entidade persistida', async () => {
       const filialPersistida = new Filial(
-       1,
+        1,
         dadosValidos.nome,
         dadosValidos.endereco,
         dadosValidos.telefone,

@@ -44,7 +44,7 @@ describe('ListarFiliaisUseCase', () => {
     }).compile();
 
     useCase = module.get<ListarFiliaisUseCase>(ListarFiliaisUseCase);
-    filialRepo = module.get(FilialRepository) as jest.Mocked<FilialRepository>;
+    filialRepo = module.get(FilialRepository);
   });
 
   it('deve estar definido', () => {

@@ -8,6 +8,7 @@ import {
   Param,
   HttpCode,
   HttpStatus,
+  Query,
 } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiParam } from '@nestjs/swagger';
 import * as crypto from 'crypto';
@@ -25,6 +26,8 @@ import { AtualizarFeedbackDto } from '../dtos/atualizar-feedback.dto';
 import { RespostaObjetiva } from '../../../core/domain/feedback/resposta-objetiva.entity';
 import { Feedback } from '../../../core/domain/feedback/feedback.entity';
 import { CriarFeedbackUseCase } from 'src/core/use-cases/feedback/create-feedback.use-case';
+import { BuscarFeedbacksQueryDto } from '../dtos/buscar-feedbacks.dto';
+import { BuscarFeedbackUseCase } from 'src/core/use-cases/feedback/buscar-feedbacks.use-case';
 
 @ApiTags('feedbacks') // Agrupa todos os endpoints deste controller no Swagger
 @Controller('feedbacks')
@@ -34,6 +37,7 @@ export class FeedbackController {
     private readonly listarUC: ListarFeedbacksUseCase,
     private readonly deletarUC: DeletarFeedbackUseCase,
     private readonly atualizarUC: AtualizarFeedbackUseCase,
+    private readonly buscarUC: BuscarFeedbackUseCase,
   ) {}
 
   @Post()
@@ -122,5 +126,19 @@ export class FeedbackController {
   @HttpCode(HttpStatus.NO_CONTENT)
   async remover(@Param('id') id: string) {
     await this.deletarUC.executar(id);
+  }
+
+  @Get()
+  @ApiOperation({ summary: 'Listar ou buscar feedbacks com filtros' })
+  @ApiResponse({
+    status: 200,
+    description: 'Feedbacks retornados com sucesso.',
+  })
+  async buscar(@Query() query: BuscarFeedbacksQueryDto) {
+    return await this.buscarUC.executar({
+      clienteId: query.clienteId,
+      filialId: query.filialId,
+      status: query.status,
+    });
   }
 }

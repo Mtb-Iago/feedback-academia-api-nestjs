@@ -74,13 +74,9 @@ describe('CriarFeedbackUseCase', () => {
     }).compile();
 
     useCase = module.get<CriarFeedbackUseCase>(CriarFeedbackUseCase);
-    feedbackRepo = module.get(
-      FeedbackRepository,
-    ) as jest.Mocked<FeedbackRepository>;
-    clienteRepo = module.get(
-      ClienteRepository,
-    ) as jest.Mocked<ClienteRepository>;
-    filialRepo = module.get(FilialRepository) as jest.Mocked<FilialRepository>;
+    feedbackRepo = module.get(FeedbackRepository);
+    clienteRepo = module.get(ClienteRepository);
+    filialRepo = module.get(FilialRepository);
   });
 
   it('deve estar definido', () => {

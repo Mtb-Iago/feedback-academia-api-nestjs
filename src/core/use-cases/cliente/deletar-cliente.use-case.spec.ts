@@ -36,9 +36,7 @@ describe('DeletarClienteUseCase', () => {
     }).compile();
 
     useCase = module.get<DeletarClienteUseCase>(DeletarClienteUseCase);
-    clienteRepo = module.get(
-      ClienteRepository,
-    ) as jest.Mocked<ClienteRepository>;
+    clienteRepo = module.get(ClienteRepository);
   });
 
   it('deve estar definido', () => {

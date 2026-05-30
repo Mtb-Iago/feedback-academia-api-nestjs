@@ -6,4 +6,9 @@ export abstract class FeedbackRepository {
   abstract listarTodos(): Promise<Feedback[]>;
   abstract atualizar(id: string, dados: Partial<Feedback>): Promise<Feedback>;
   abstract deletar(id: string): Promise<void>;
+  abstract buscarPorFiltros(filtros: {
+    clienteId?: string;
+    filialId?: string;
+    status?: string;
+  }): Promise<Feedback[]>;
 }

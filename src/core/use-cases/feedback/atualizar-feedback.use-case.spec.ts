@@ -34,9 +34,7 @@ describe('AtualizarFeedbackUseCase', () => {
     }).compile();
 
     useCase = module.get<AtualizarFeedbackUseCase>(AtualizarFeedbackUseCase);
-    feedbackRepo = module.get(
-      FeedbackRepository,
-    ) as jest.Mocked<FeedbackRepository>;
+    feedbackRepo = module.get(FeedbackRepository);
   });
 
   it('deve estar definido', () => {

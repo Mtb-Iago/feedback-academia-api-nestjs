@@ -8,7 +8,7 @@ export class AtualizarCategoriaUseCase {
 
   async executar(id: number, dados: Partial<Categoria>): Promise<Categoria> {
     const categoriaExistente = await this.categoriaRepository.buscarPorId(id);
-    
+
     if (!categoriaExistente) {
       throw new NotFoundException(`Categoria com ID ${id} não encontrada.`);
     }

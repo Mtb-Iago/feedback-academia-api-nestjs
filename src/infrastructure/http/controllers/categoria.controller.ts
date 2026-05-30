@@ -63,10 +63,13 @@ export class CategoriaController {
   @Patch(':id')
   @ApiOperation({ summary: 'Atualizar uma categoria existente' })
   @ApiParam({ name: 'id', description: 'ID da categoria', type: 'number' })
-  @ApiResponse({ status: 200, description: 'Categoria atualizada com sucesso.' })
+  @ApiResponse({
+    status: 200,
+    description: 'Categoria atualizada com sucesso.',
+  })
   @ApiResponse({ status: 404, description: 'Categoria não encontrada.' })
   async atualizar(
-    @Param('id', ParseIntPipe) id: number, 
+    @Param('id', ParseIntPipe) id: number,
     @Body() dto: AtualizarCategoriaDto,
   ) {
     const dadosParaAtualizar: Partial<Categoria> = {};

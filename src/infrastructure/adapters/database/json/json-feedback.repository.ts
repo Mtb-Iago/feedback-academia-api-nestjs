@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotImplementedException } from '@nestjs/common';
 import * as fs from 'fs/promises';
 import * as path from 'path';
 import { FeedbackRepository } from '../../../../core/ports/feedback.repository';
@@ -68,5 +68,13 @@ export class JsonFeedbackRepository implements FeedbackRepository {
     const feedbacks = await this.lerArquivo();
     const filtrados = feedbacks.filter((f) => f.id_feedback !== id);
     await this.escreverArquivo(filtrados);
+  }
+  buscarPorFiltros(filtros: {
+    clienteId?: string;
+    filialId?: string;
+    status?: string;
+  }): Promise<Feedback[]> {
+
+    throw new NotImplementedException(`Metodo não implementado`);
   }
 }

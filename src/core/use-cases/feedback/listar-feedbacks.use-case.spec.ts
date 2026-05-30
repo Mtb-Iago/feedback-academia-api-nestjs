@@ -43,9 +43,7 @@ describe('ListarFeedbacksUseCase', () => {
     }).compile();
 
     useCase = module.get<ListarFeedbacksUseCase>(ListarFeedbacksUseCase);
-    feedbackRepo = module.get(
-      FeedbackRepository,
-    ) as jest.Mocked<FeedbackRepository>;
+    feedbackRepo = module.get(FeedbackRepository);
   });
 
   it('deve estar definido', () => {

@@ -1,4 +1,4 @@
-import { Cliente } from "../domain/cliente/cliente.entity";
+import { Cliente } from '../domain/cliente/cliente.entity';
 
 export abstract class ClienteRepository {
   abstract salvar(feedback: Cliente): Promise<void>;

@@ -7,7 +7,7 @@ export class DeletarCategoriaUseCase {
 
   async executar(id: number): Promise<void> {
     const categoriaExistente = await this.categoriaRepository.buscarPorId(id);
-    
+
     if (!categoriaExistente) {
       throw new NotFoundException(`Categoria com ID ${id} não encontrada.`);
     }

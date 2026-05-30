@@ -21,7 +21,7 @@ import { JsonCategoriaRepository } from './infrastructure/adapters/database/json
     ListarCategoriasUseCase,
     AtualizarCategoriaUseCase,
     DeletarCategoriaUseCase,
-    
+
     {
       provide: CategoriaRepository,
       useClass: JsonCategoriaRepository,

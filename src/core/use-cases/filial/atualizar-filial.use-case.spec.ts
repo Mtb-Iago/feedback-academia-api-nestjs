@@ -36,7 +36,7 @@ describe('AtualizarFilialUseCase', () => {
     }).compile();
 
     useCase = module.get<AtualizarFilialUseCase>(AtualizarFilialUseCase);
-    filialRepo = module.get(FilialRepository) as jest.Mocked<FilialRepository>;
+    filialRepo = module.get(FilialRepository);
   });
 
   it('deve estar definido', () => {
@@ -143,9 +143,9 @@ describe('AtualizarFilialUseCase', () => {
     it('deve lançar NotFoundException quando a filial não for encontrada', async () => {
       filialRepo.buscarPorId.mockResolvedValue(null);
 
-      await expect(
-        useCase.executar(999, { nome: 'X' }),
-      ).rejects.toThrow(NotFoundException);
+      await expect(useCase.executar(999, { nome: 'X' })).rejects.toThrow(
+        NotFoundException,
+      );
     });
 
     it('a mensagem de erro deve incluir o id da filial', async () => {
@@ -159,9 +159,9 @@ describe('AtualizarFilialUseCase', () => {
     it('NÃO deve chamar atualizar quando a filial não existir', async () => {
       filialRepo.buscarPorId.mockResolvedValue(null);
 
-      await expect(
-        useCase.executar(999, { nome: 'X' }),
-      ).rejects.toThrow(NotFoundException);
+      await expect(useCase.executar(999, { nome: 'X' })).rejects.toThrow(
+        NotFoundException,
+      );
 
       expect(filialRepo.atualizar).not.toHaveBeenCalled();
     });
@@ -169,9 +169,9 @@ describe('AtualizarFilialUseCase', () => {
     it('deve consultar buscarPorId mesmo quando a filial não existir', async () => {
       filialRepo.buscarPorId.mockResolvedValue(null);
 
-      await expect(
-        useCase.executar(999, { nome: 'X' }),
-      ).rejects.toThrow(NotFoundException);
+      await expect(useCase.executar(999, { nome: 'X' })).rejects.toThrow(
+        NotFoundException,
+      );
 
       expect(filialRepo.buscarPorId).toHaveBeenCalledWith(999);
       expect(filialRepo.buscarPorId).toHaveBeenCalledTimes(1);

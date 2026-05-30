@@ -36,7 +36,7 @@ describe('DeletarFilialUseCase', () => {
     }).compile();
 
     useCase = module.get<DeletarFilialUseCase>(DeletarFilialUseCase);
-    filialRepo = module.get(FilialRepository) as jest.Mocked<FilialRepository>;
+    filialRepo = module.get(FilialRepository);
   });
 
   it('deve estar definido', () => {

@@ -3,6 +3,6 @@ export class Categoria {
     public readonly id_categoria: number,
     public nome: string,
     public descricao: string,
-    public ordem_exibicao: number
+    public ordem_exibicao: number,
   ) {}
 }
