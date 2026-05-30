@@ -6,21 +6,31 @@ import { ClienteModule } from './cliente.module';
 import { CategoriaModule } from './categoria.module';
 import { FilialModule } from './filial.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { FeedbackOrmEntity } from './infrastructure/adapters/database/typeorm/entities/feedback.orm-entity';
 import { RespostaObjetivaOrmEntity } from './infrastructure/adapters/database/typeorm/entities/resposta-objetiva.orm-entity';
 import { ClienteOrmEntity } from './infrastructure/adapters/database/typeorm/entities/cliente.orm-entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forRoot({
-      type: 'postgres',
-      host: 'localhost',
-      port: 5432,
-      username: 'admin',
-      password: 'admin_password',
-      database: 'feedback_db',
-      entities: [FeedbackOrmEntity, RespostaObjetivaOrmEntity, ClienteOrmEntity],
-      synchronize: true, // APENAS PARA DESENVOLVIMENTO (Cria as tabelas automaticamente)
+    ConfigModule.forRoot({ isGlobal: true }),
+    TypeOrmModule.forRootAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: (config: ConfigService) => ({
+        type: 'postgres',
+        host: config.get<string>('DB_HOST'),
+        port: config.get<number>('DB_PORT'),
+        username: config.get<string>('DB_USERNAME'),
+        password: config.get<string>('DB_PASSWORD'),
+        database: config.get<string>('DB_DATABASE'),
+        entities: [
+          FeedbackOrmEntity,
+          RespostaObjetivaOrmEntity,
+          ClienteOrmEntity,
+        ],
+        synchronize: true, // APENAS PARA DESENVOLVIMENTO (Cria as tabelas automaticamente)
+      }),
     }),
     FeedbackModule,
     FilialModule,

@@ -44,14 +44,46 @@ A estrutura segue o padrão hexagonal para garantir testabilidade e facilidade d
     > usuário `admin`, senha `admin_password` e database `feedback_db`.
     > Garanta que não exista outro PostgreSQL ocupando a porta `5432` no host.
 
-3.  **Iniciar em modo de desenvolvimento:**
+3.  **Configurar as variáveis de ambiente (`.env`):**
+
+    A conexão com o banco é lida de um arquivo `.env` na raiz do projeto
+    (via `@nestjs/config` + `TypeOrmModule.forRootAsync`). Copie o template:
+
+    ```bash
+    cp .env.example .env
+    ```
+
+    Os valores abaixo já apontam para o banco provisionado pelo Docker Compose
+    e podem ser usados como estão — **são credenciais apenas de desenvolvimento/teste**:
+
+    ```env
+    DB_HOST=localhost
+    DB_PORT=5432
+    DB_USERNAME=admin
+    DB_PASSWORD=admin_password
+    DB_DATABASE=feedback_db
+    ```
+
+    | Variável | Descrição | Valor padrão (Docker) |
+    | :--- | :--- | :--- |
+    | `DB_HOST` | Host do PostgreSQL | `localhost` |
+    | `DB_PORT` | Porta do PostgreSQL | `5432` |
+    | `DB_USERNAME` | Usuário do banco | `admin` |
+    | `DB_PASSWORD` | Senha do banco | `admin_password` |
+    | `DB_DATABASE` | Nome do database | `feedback_db` |
+
+    > O `.env` está no `.gitignore` e **não é versionado**. Esses mesmos valores
+    > devem coincidir com os do `docker-compose.yml`. Em produção, use credenciais
+    > próprias e nunca comite o `.env`.
+
+4.  **Iniciar em modo de desenvolvimento:**
     ```bash
     npm run start:dev
     ```
     > Com `synchronize: true` (apenas dev), o TypeORM cria as tabelas
     > automaticamente a partir das entidades.
 
-4.  **Acessar documentação (Swagger):**
+5.  **Acessar documentação (Swagger):**
     Abra o navegador em `http://localhost:3000/api`
 
 ## 📡 Endpoints
