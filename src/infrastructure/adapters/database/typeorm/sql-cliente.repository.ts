@@ -28,10 +28,8 @@ export class SqlClienteRepository implements ClienteRepository {
   }
 
   async buscarPorId(id: string): Promise<Cliente | null> {
-    console.log('aquiiiii',id);
+    
     const ormEntity = await this.repo.findOne({ where: { id } });
-    console.log(ormEntity);
-    console.log(id);
     if (!ormEntity) return null;
     return this.toDomain(ormEntity);
   }
